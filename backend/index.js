@@ -7,7 +7,7 @@ require("dotenv").config();
 const dbConfig = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
-// const authenticateToken = require("./middlewares/authenticateToken");
+const authenticateToken = require("./middlewares/authenticateToken");
 
 const app = express();
 const port = process.env.PORT || 2000;
@@ -23,7 +23,7 @@ mongoose
 
 // Routes
 app.use("/auth", authRoutes);
-app.use("/user", userRoutes);
+app.use("/user", authenticateToken, userRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
