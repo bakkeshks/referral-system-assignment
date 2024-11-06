@@ -1,7 +1,37 @@
 const User = require("../models/User");
 const Referral = require("../models/Referral");
 
-// Apply referral using username
+exports.getTopReferrers = async (req, res) => {
+  try {
+    const topReferrers = await User.find()
+      .sort({ referralCount: -1 })
+      .limit(5)
+      .select("username referralCount referralCode");
+
+    res.status(200).json({ success: true, data: topReferrers });
+  } catch (error) {
+    console.error("Error fetching top referrers:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+exports.getUserDetails = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const referralCount = user.referralCount;
+    const referralCode = user.referralCode;
+    const referredUsers = await User.find({ _id: { $in: user.referredUsers } });
+    res.json({ referralCount, referralCode, referredUsers });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 exports.applyReferral = async (req, res) => {
   const { username, referralCode } = req.body;
 
@@ -50,49 +80,5 @@ exports.applyReferral = async (req, res) => {
   } catch (error) {
     console.error("Error applying referral:", error);
     res.status(500).json({ success: false, message: "Server error" });
-  }
-};
-
-exports.getTopReferrers = async (req, res) => {
-  try {
-    const topReferrers = await User.find()
-      .sort({ referralCount: -1 }) // Sort by referralCount in descending order
-      .limit(5)
-      .select("username referralCount referralCode");
-
-    res.status(200).json({ success: true, data: topReferrers });
-  } catch (error) {
-    console.error("Error fetching top referrers:", error);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
-};
-
-exports.getReferralCount = async (req, res) => {
-  try {
-    const userId = req.params.id;
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    const referralCount = user.referralCount;
-    res.json({ referralCount });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-exports.getReferredUsers = async (req, res) => {
-  try {
-    const userId = req.params.id;
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    const referredUsers = await User.find({ _id: { $in: user.referredUsers } });
-    res.json({ referredUsers });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
   }
 };

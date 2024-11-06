@@ -7,7 +7,6 @@ router.post("/apply-referral", userController.applyReferral);
 // get top referrers
 router.get("/get-top-referrers", userController.getTopReferrers);
 
-router.get("/:id/referral-count", userController.getReferralCount);
-router.get("/:id/referrals", userController.getReferredUsers);
+router.get("/:id/user-details", userController.getUserDetails);
 
 module.exports = router;

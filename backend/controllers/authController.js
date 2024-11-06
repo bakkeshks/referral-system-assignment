@@ -38,7 +38,7 @@ exports.register = async (req, res) => {
       if (!referrer) {
         return res
           .status(400)
-          .json({ success: false, message: "Invalid referral code." });
+          .json({ success: false, error: "Invalid referral code." });
       }
     }
 
